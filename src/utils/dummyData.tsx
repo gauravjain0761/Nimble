@@ -193,7 +193,7 @@ export const products = [
         name: 'Mars 52g Chocolate Caramel Candy Bar',
         price: '2.00',
         storeID: 2,
-        barcode: '123456789020',
+        barcode: '00058496328733',
       },
       {
         id: 8,
@@ -201,7 +201,7 @@ export const products = [
         name: 'Excel Sugar Free Winterfresh Chewing Gum Single Pack',
         price: '2.50',
         storeID: 7,
-        barcode: '123456789061',
+        barcode: '064900000348',
       },
     ],
   },
