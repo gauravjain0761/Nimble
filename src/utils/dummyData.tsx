@@ -187,6 +187,22 @@ export const products = [
         tags: ['Parle-G Gold', 'Gold', ' G', 'Parle', 'biscuits'],
         barcode: '987654321098',
       },
+      {
+        id: 7,
+        image: Icons.chocolate_p_2.p4,
+        name: 'Mars 52g Chocolate Caramel Candy Bar',
+        price: '2.00',
+        storeID: 2,
+        barcode: '123456789020',
+      },
+      {
+        id: 8,
+        image: Icons.gum_p_7.p6,
+        name: 'Excel Sugar Free Winterfresh Chewing Gum Single Pack',
+        price: '2.50',
+        storeID: 7,
+        barcode: '123456789061',
+      },
     ],
   },
   {
