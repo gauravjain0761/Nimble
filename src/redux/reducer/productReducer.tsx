@@ -116,6 +116,7 @@ export default function (state = initialState, action: any) {
         orderListData: [...state.orderListData, action.data],
       };
     }
+
     case UPDATE_ORDER_LIST: {
       const {newProduct, storeId, quantity} = action.payload;
 

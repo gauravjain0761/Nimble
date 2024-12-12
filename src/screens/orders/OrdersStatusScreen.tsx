@@ -25,16 +25,25 @@ import {useIsFocused} from '@react-navigation/native';
 import {ASS_STATUS_ORDER_LIST_DATA} from '../../redux/actionTypes';
 
 const OrdersStatusScreen = ({navigation, route}: any) => {
+  const notifications = useAppSelector(state => state.common.notifications);
+  console.log('Notifications:', notifications);
+
   const {type, orderData, cartItem} = route.params || {};
   const {orderListData}: any = useAppSelector(state => state.product);
   const {time} = useAppSelector(state => state.common);
   const isFocused = useIsFocused();
   const dispatch = useAppDispatch();
-  const [orderStatus, setOrderStatus] = useState('Placed');
   const [outOfStock, setOutOfStock] = useState(false);
   const [cancelOrder, setCancelOrder] = useState(false);
-
+  const [status, setStatus] = useState('');
+  const [orderStatus, setOrderStatus] = useState('Placed');
   const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setOrderStatus(status);
+  }, [status]);
+
+  console.log('notifications->', notifications);
 
   const [productsData, setProductsData] = useState([]);
 
@@ -46,12 +55,26 @@ const OrdersStatusScreen = ({navigation, route}: any) => {
   });
 
   useEffect(() => {
-    if (type === 'order') {
+    setOrderStatus(
+      notifications?.notificationData?.message ==
+        'Your order status has been updated to Preparing.'
+        ? 'Preparing'
+        : notifications?.notificationData?.message ==
+          'Your order status has been updated to Ready.'
+        ? 'Ready'
+        : 'Placed',
+    );
+  }, [notifications]);
+
+  useEffect(() => {
+    if (type !== 'order') {
       const [newData] = orderListData?.filter((item: any) => {
         return item?.storeData?.id === orderData?.storeData?.id;
       });
-      setAllPrice(newData.price);
-      setProductsData(newData.products);
+      console.log('NewData->', newData);
+
+      setAllPrice(newData?.price);
+      setProductsData(newData?.products);
     } else {
       if (cartItem.products.length > 0) {
         const [newData] = orderListData?.filter((item: any) => {
@@ -157,6 +180,10 @@ const OrdersStatusScreen = ({navigation, route}: any) => {
           name={orderStatus}
           outOfStock={outOfStock}
           cancelOrder={cancelOrder}
+          onStatusPress={status => {
+            setStatus(status);
+            console.log('Status pressed:', status);
+          }}
         />
       </View>
       <ScrollView
@@ -218,6 +245,35 @@ const OrdersStatusScreen = ({navigation, route}: any) => {
 
         {orderStatus == 'Preparing' && (
           <>
+            <TouchableOpacity
+              onPress={() => {
+                setOutOfStock(true);
+              }}
+              style={styles.statusMessage}>
+              <Text style={styles.confirmed1}>
+                Your order is Prepaing.{' '}
+                <Text style={styles.confirmed2}>
+                  Just sit back and we will notify you when it’s ready!
+                </Text>
+              </Text>
+            </TouchableOpacity>
+
+            {outOfStock && (
+              <PrimaryButton
+                type="fill"
+                title="Update Order"
+                onPress={() => {
+                  navigationRef.navigate(screenName.UpdateOrder, {
+                    type: 'update',
+                  });
+                }}
+                style={[styles.button, {marginBottom: 12}]}
+              />
+            )}
+          </>
+        )}
+        {orderStatus == 'Ready' && (
+          <>
             <View style={styles.statusMessage}>
               <Text style={styles.statusText}>
                 Your order is ready!{' '}
@@ -243,11 +299,7 @@ const OrdersStatusScreen = ({navigation, route}: any) => {
               }}
               style={[styles.button, {paddingVertical: hp(3)}]}
             />
-          </>
-        )}
-        {orderStatus == 'Ready' && (
-          <>
-            <View style={styles.readyView}>
+            {/* <View style={styles.readyView}>
               <Text style={styles.readyViewText}>
                 The order was never picked up.{' '}
                 <Text style={styles.readyViewText1}>
@@ -261,12 +313,32 @@ const OrdersStatusScreen = ({navigation, route}: any) => {
               title="Order Again"
               onPress={() => {}}
               style={[styles.button, {marginBottom: 10}]}
-            />
+            /> */}
           </>
         )}
         {orderStatus === 'Collected' && (
           <>
-            <View style={styles.readyView}>
+            <View style={styles.statusMessage}>
+              <Text style={styles.statusText}>
+                Your order has been collected.{' '}
+                <Text style={styles.statusText}>
+                  The store is unable to fulfill your order at the moment.
+                </Text>
+              </Text>
+            </View>
+
+            <PrimaryButton
+              type="fill"
+              title="Shop at Other Stores"
+              onPress={() => {
+                navigationRef.navigate(screenName.tabBarName.HomeScreen);
+              }}
+              style={[
+                styles.button,
+                {marginBottom: 10, paddingHorizontal: wp(0)},
+              ]}
+            />
+            {/* <View style={styles.readyView}>
               <Text style={styles.readyViewText}>
                 Your order has been cancelled.{' '}
                 <Text style={styles.readyViewText1}>
@@ -285,7 +357,7 @@ const OrdersStatusScreen = ({navigation, route}: any) => {
                 styles.button,
                 {marginBottom: 10, paddingHorizontal: wp(0)},
               ]}
-            />
+            /> */}
           </>
         )}
 

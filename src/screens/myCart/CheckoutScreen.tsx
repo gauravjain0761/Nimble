@@ -29,12 +29,13 @@ import {onPaymentApi} from '../../action/cartAction';
 const CheckoutScreen = ({route}: {route: any}) => {
   const {cartItem} = route.params || {};
   const {userData} = useAppSelector(state => state.common);
-
+  const [isTip, setIsTip] = useState(false);
   const [addTripsSelect, setAddTripsSelect] = useState('');
   const {data}: any = useAppSelector(state => state.product);
   const {time} = useAppSelector(state => state.common);
 
   const dispatch = useAppDispatch();
+  const [selectedCollectionTime, setSelectedCollectionTime] = useState('');
   const [productsData, setProductsData] = useState([]);
   const [dropDown1, setDropDown1] = useState('Today');
   const [dropDown2, setDropDown2] = useState('2:00 pm');
@@ -56,8 +57,48 @@ const CheckoutScreen = ({route}: {route: any}) => {
     if (time) {
       setDropDown1(time.date);
       setDropDown2(time.time);
+      const handleConversion = () => {
+        const isoString = convertToISO(dropDown1, dropDown2);
+        setSelectedCollectionTime(isoString);
+        console.log('Converted ISO String:', isoString);
+      };
+      handleConversion();
     }
   }, [time]);
+
+  function convertToISO(dropDown1: string, dropDown2: string): string {
+    const now = new Date();
+    let date = new Date();
+
+    switch (dropDown1) {
+      case 'Today':
+        date = now;
+        break;
+      case 'Tomorrow':
+        date.setDate(now.getDate() + 1);
+        break;
+      default:
+        date = new Date(dropDown1);
+    }
+
+    const timeMatch = dropDown2.match(/(\d+):(\d+) (am|pm)/i);
+    if (timeMatch) {
+      let [_, hours, minutes, period] = timeMatch;
+      hours =
+        period.toLowerCase() === 'pm' && parseInt(hours) !== 12
+          ? String(parseInt(hours) + 12)
+          : hours;
+      hours =
+        period.toLowerCase() === 'am' && parseInt(hours) === 12 ? '0' : hours;
+
+      date.setHours(parseInt(hours));
+      date.setMinutes(parseInt(minutes));
+      date.setSeconds(0);
+      date.setMilliseconds(0);
+    }
+
+    return date.toISOString();
+  }
 
   useEffect(() => {
     if (productsData.length > 0) {
@@ -97,7 +138,12 @@ const CheckoutScreen = ({route}: {route: any}) => {
   const addRenderItem = ({item}: any) => {
     return (
       <TouchableOpacity
-        onPress={() => setAllPrice({...allPrice, tip: item?.title})}
+        onPress={() => {
+          setIsTip(!isTip);
+          isTip
+            ? setAllPrice({...allPrice, tip: item?.title})
+            : setAllPrice({...allPrice, tip: '0'});
+        }}
         style={[
           styles.addListView,
           {
@@ -194,7 +240,7 @@ const CheckoutScreen = ({route}: {route: any}) => {
           street: 'test address',
         },
         totalPrice: allPrice.total,
-        selectedCollectionTime: '2023-11-04T08:46:41.858Z',
+        selectedCollectionTime: selectedCollectionTime,
         isPremium: false,
       },
       onSuccess: (res: any) => {
@@ -216,6 +262,7 @@ const CheckoutScreen = ({route}: {route: any}) => {
           headerText: 'Your order is being\nplaced...',
           type: 'order',
           cartItem: cartItem,
+          orderData: cartItem,
         });
         dispatch(removeAllProduct(cartItem));
       },

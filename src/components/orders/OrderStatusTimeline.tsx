@@ -1,6 +1,5 @@
-/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, Text, StyleSheet, Image, FlatList} from 'react-native';
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import {Icons} from '../../assets';
 import {commonFontStyle, SCREEN_WIDTH, wp} from '../../theme/fonts';
 import {colors} from '../../theme/colors';
@@ -34,11 +33,14 @@ interface IProps {
   name?: string;
   outOfStock?: boolean;
   cancelOrder?: boolean;
+  onStatusPress?: (status: string) => void; // Callback for button press
 }
+
 const OrderStatusTimeline = ({
   name = 'Placed',
   outOfStock,
   cancelOrder,
+  onStatusPress,
 }: IProps) => {
   return (
     <View
@@ -46,53 +48,53 @@ const OrderStatusTimeline = ({
         styles.container,
         name === 'Confirmed' && outOfStock && {marginBottom: 40},
       ]}>
-      {dataList?.map((item, index) => {
-        return (
-          <>
-            {index !== 0 && (
-              <Image source={Icons.ic_dotLine} style={styles.line} />
-            )}
-            <View style={styles.statusItem}>
-              <View
-                style={[
-                  styles.iconContainer,
-                  index < statusValue(name) && styles.active,
-                ]}>
-                <Image
-                  source={
-                    item?.name === 'Collected' && cancelOrder
-                      ? Icons.close
-                      : item?.name === 'Confirmed'
-                      ? outOfStock
-                        ? Icons.need
-                        : item.icons
+      {dataList?.map((item, index) => (
+        <React.Fragment key={item.id}>
+          {index !== 0 && (
+            <Image source={Icons.ic_dotLine} style={styles.line} />
+          )}
+          <TouchableOpacity
+            style={styles.statusItem}
+            onPress={() => onStatusPress?.(item.name)} // Handle button press
+          >
+            <View
+              style={[
+                styles.iconContainer,
+                index < statusValue(name) && styles.active,
+              ]}>
+              <Image
+                source={
+                  item?.name === 'Collected' && cancelOrder
+                    ? Icons.close
+                    : item?.name === 'Confirmed'
+                    ? outOfStock
+                      ? Icons.need
                       : item.icons
-                  }
-                  // tintColor={cancelOrder ? colors.grey_8D : undefined}
-                  style={[
-                    styles.cartImage,
-                    index < statusValue(name) && styles.activeIcon,
-                  ]}
-                />
-              </View>
-              <Text
+                    : item.icons
+                }
                 style={[
-                  styles.statusText,
-                  styles.activeText,
-                  item?.name === 'Confirmed' && outOfStock && {bottom: -35},
-                ]}>
-                {item?.name === 'Collected' && cancelOrder
-                  ? 'Cancelled'
-                  : item?.name === 'Confirmed'
-                  ? outOfStock
-                    ? 'Needs\nReview'
-                    : item?.name
-                  : item?.name}
-              </Text>
+                  styles.cartImage,
+                  index < statusValue(name) && styles.activeIcon,
+                ]}
+              />
             </View>
-          </>
-        );
-      })}
+            <Text
+              style={[
+                styles.statusText,
+                styles.activeText,
+                item?.name === 'Confirmed' && outOfStock && {bottom: -35},
+              ]}>
+              {item?.name === 'Collected' && cancelOrder
+                ? 'Cancelled'
+                : item?.name === 'Confirmed'
+                ? outOfStock
+                  ? 'Needs\nReview'
+                  : item?.name
+                : item?.name}
+            </Text>
+          </TouchableOpacity>
+        </React.Fragment>
+      ))}
     </View>
   );
 };
@@ -101,9 +103,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    // justifyContent: 'space-between',
     marginVertical: 20,
-    // marginHorizontal: 20,
     alignSelf: 'center',
     marginBottom: 35,
   },
@@ -125,9 +125,6 @@ const styles = StyleSheet.create({
   activeIcon: {
     tintColor: '#5F6368',
   },
-  current: {
-    backgroundColor: '#E0E0E0',
-  },
   statusText: {
     position: 'absolute',
     bottom: -18,
@@ -137,9 +134,6 @@ const styles = StyleSheet.create({
   },
   activeText: {
     color: '#00473E',
-  },
-  currentText: {
-    color: '#666666',
   },
   line: {
     height: 1,

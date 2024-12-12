@@ -23,6 +23,7 @@ import {Icons} from '../../../assets';
 import {heightPercentageToDP} from 'react-native-responsive-screen';
 import Slider from '../../../components/common/Slider';
 import {products} from '../../../utils/dummyData';
+import {successToast} from '../../../utils/commonFunction';
 
 const BardcodeScanner = ({}) => {
   const camera = useRef(null);
@@ -107,6 +108,7 @@ const BardcodeScanner = ({}) => {
   const handleDecreaseQuantity = () =>
     setQuantity(prev => (prev > 1 ? prev - 1 : 1));
   const handleAddToOrder = () => {
+    successToast('Product added to cart');
     setCartCount(prevCount => prevCount + quantity);
     setCartAmount(
       prevAmount =>

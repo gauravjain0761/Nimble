@@ -14,18 +14,21 @@ const WebSocketComponent = ({userId}) => {
     socketInstance.on('connect', () => {
       setSocketConnected(true);
       console.log('Socket.IO connected');
-      console.log(
-        `Emitting join_user_room with userId: 670d0e1b7fd8a344b87bedb0`,
-      );
-      socketInstance.emit('join_user_room', '670d0e1b7fd8a344b87bedb0');
+
+      const userId = 'user_6750171390baedc8b36ce2af';
+      socketInstance.emit('join_user_room', userId, response => {
+        console.log('Room joined response:', response);
+      });
     });
 
+    // Handling server responses
     socketInstance.on('room_joined', message => {
-      console.log(message);
+      console.log('Room joined successfully:', message);
     });
 
+    // Listening for notifications
     socketInstance.on('notification', notification => {
-      Alert.alert('New notification', notification.message);
+      console.log('Received notification:', notification);
     });
 
     socketInstance.on('disconnect', () => {

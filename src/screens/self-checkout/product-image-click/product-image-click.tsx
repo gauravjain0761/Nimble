@@ -30,7 +30,7 @@ import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import {useAppSelector} from '../../../redux/hooks';
 import RNFetchBlob from 'rn-fetch-blob';
 import HapticFeedback from 'react-native-haptic-feedback';
-import {errorToast} from '../../../utils/commonFunction';
+import {errorToast, successToast} from '../../../utils/commonFunction';
 import {products} from '../../../utils/dummyData';
 
 const ImageClickScreen = ({}) => {
@@ -286,6 +286,7 @@ const ImageClickScreen = ({}) => {
   };
 
   const handleAddToOrder = () => {
+    successToast('Product added to cart');
     // Update the cart count and amount
     setCartCount(prevCount => prevCount + quantity);
     setCartAmount(

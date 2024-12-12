@@ -11,19 +11,21 @@ import {
   SCREEN_WIDTH,
   wp,
 } from '../../theme/fonts';
-import {useRoute} from '@react-navigation/native';
+import {useIsFocused, useRoute} from '@react-navigation/native';
 import {PrimaryButton} from '../../components/common';
 import {navigationRef} from '../../navigation/mainNavigator';
 import {screenName} from '../../navigation/screenNames';
 
 const LoadingScreen = () => {
   const {params}: any = useRoute();
-
+  const isFocused = useIsFocused();
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (params?.type === 'order') {
         navigationRef.navigate(screenName.OrdersStatusScreen, {
           cartItem: params.cartItem,
+          type: params.type,
+          orderData: params.cartItem,
         });
       } else if (params?.type === 'start_checkout') {
         navigationRef.navigate(screenName.StartCheckoutScreen);
@@ -34,7 +36,7 @@ const LoadingScreen = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, []);
+  }, [isFocused]);
   return (
     <SafeAreaView style={[AppStyles.flex, styles.container]}>
       <View style={styles.logo_container}>

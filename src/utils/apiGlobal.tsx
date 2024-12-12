@@ -47,6 +47,7 @@ export const makeAPIRequest = ({
           });
         } else {
           console.log('Something went wrong, please try again.');
+          console.log(error);
 
           // infoToast('Something went wrong, please try again.');
         }

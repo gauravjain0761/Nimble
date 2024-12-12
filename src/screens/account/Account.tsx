@@ -16,9 +16,11 @@ import {commonFontStyle, hp, wp} from '../../theme/fonts';
 import {navigationRef} from '../../navigation/mainNavigator';
 import {screenName} from '../../navigation/screenNames';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
-import {errorToast} from '../../utils/commonFunction';
+import {errorToast, infoToast} from '../../utils/commonFunction';
 import {onGetUser} from '../../action/accountAction';
 import {USER_LOGOUT} from '../../redux/actionTypes';
+import {disconnectSocket} from '../../redux/action/productAction';
+import {io} from 'socket.io-client';
 
 interface ImageTextViewProps {
   image: any;
@@ -56,7 +58,21 @@ const Account: FC = ({navigation}: any) => {
     email: 'john.doe@gmail.com',
     image: Icons.account,
   });
-console.log('userData',userData)
+  console.log('userData', userData);
+  const socketInstance = io('wss://nimble-backend-services.onrender.com', {
+    transports: ['websocket'],
+  });
+  const handleLogout = () => {
+    if (socketInstance) {
+      socketInstance.on('disconnect', () => {
+        infoToast('Websocket disconnected');
+        console.log('Socket.IO disconnected');
+      });
+      dispatch(disconnectSocket()); // Dispatch the disconnect action to Redux
+      console.log('Logged out, socket disconnected');
+    }
+  };
+
   const LogOut = () =>
     Alert.alert('Log Out', 'Are you sure you want to log out?', [
       {
@@ -67,6 +83,7 @@ console.log('userData',userData)
       {
         text: 'OK',
         onPress: () => {
+          handleLogout();
           dispatch({type: USER_LOGOUT});
           navigationRef.resetRoot({
             index: 0,

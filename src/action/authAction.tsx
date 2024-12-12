@@ -23,6 +23,8 @@ export const onLogin = (request: any) => async (dispatch: any) => {
     .catch((error: any) => {
       dispatch({type: IS_LOADING, payload: false});
       if (request.onFailure) {
+        console.log('Onfailure Login->', error);
+
         request.onFailure(error.response ? error.response : error);
       }
     });

@@ -31,6 +31,7 @@ import {
   decQun,
   incQun,
 } from '../../redux/action/productAction';
+import {successToast} from '../../utils/commonFunction';
 
 const ProductDetails = ({navigation}) => {
   const {params}: any = useRoute();
@@ -166,6 +167,7 @@ const ProductDetails = ({navigation}) => {
                   amount={item?.price}
                   onPressAdd={() => {
                     addToCart(item);
+                    successToast('Product added to cart');
                   }}
                   onPressHeart={() => {
                     addToWishList(item);
@@ -197,6 +199,7 @@ const ProductDetails = ({navigation}) => {
               : 'Add to Cart'
           }
           onPress={() => {
+            successToast('Product added to cart');
             if (type === 'modify' || type === 'update') {
               setModalBottom(true);
             } else {

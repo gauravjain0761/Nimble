@@ -24,7 +24,7 @@ import {screenName} from '../../navigation/screenNames';
 import {addProduct, addWishList} from '../../redux/action/productAction';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {UPDATE_ORDER_LIST} from '../../redux/actionTypes';
-import {infoToast} from '../../utils/commonFunction';
+import {infoToast, successToast} from '../../utils/commonFunction';
 
 const StoreScreen = () => {
   const {params}: any = useRoute();
@@ -203,7 +203,9 @@ const StoreScreen = () => {
                   onPressAdd={() => {
                     if (params?.type === 'modify') {
                       addOrderNewItem(item);
+                      successToast('Product added to cart');
                     } else {
+                      successToast('Product added to cart');
                       addToCart(item);
                     }
                   }}
@@ -324,6 +326,7 @@ const StoreScreen = () => {
                     images={item?.image}
                     amount={item?.price}
                     onPressAdd={() => {
+                      successToast('Product added to cart');
                       if (params?.type === 'modify') {
                         addOrderNewItem(item);
                       } else {

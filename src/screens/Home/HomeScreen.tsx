@@ -26,13 +26,23 @@ import {
 } from '../../utils/dummyData';
 import {CarouselBanner, StoreItem, TrendingItem} from '../../components';
 import {DropdownComponent, SearchInput} from '../../components/common';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {screenName} from '../../navigation/screenNames';
 import {navigationRef} from '../../navigation/mainNavigator';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
-import {addProduct, addWishList} from '../../redux/action/productAction';
+import {
+  addProduct,
+  addWishList,
+  disconnectSocket,
+  receiveNotification,
+  setSocket,
+} from '../../redux/action/productAction';
 import {CHANGE_TIME, USER_DATA} from '../../redux/actionTypes';
 import {onGetUser} from '../../action/accountAction';
+import {infoToast, successToast} from '../../utils/commonFunction';
+import {io} from 'socket.io-client';
+import {useDispatch} from 'react-redux';
+import store from '../../redux';
 
 interface HeaderViewProps {
   title: string;
@@ -55,11 +65,13 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const {userData, isLogin} = useAppSelector(state => state.common);
-
+  const isFocused = useIsFocused();
   const {wishListData} = useAppSelector(state => state.product);
   const {address, time} = useAppSelector(state => state.common);
   const [selectTab, setSelectTab] = useState(1);
+
   const [dropDown, setDropDown] = useState('');
+
   const [dropDown1, setDropDown1] = useState(time.date || 'Today');
   const [dropDown2, setDropDown2] = useState(time.time || '9:00 am');
   const [searchText, setSearchText] = useState('');
@@ -103,6 +115,66 @@ const HomeScreen = () => {
       setDropDown(result[0]);
     }
   }, [address]);
+
+  const WebSocketComponent = ({userId}: {userId: string}) => {
+    const connectSocket = () => {
+      const socketInstance = io('wss://nimble-backend-services.onrender.com', {
+        transports: ['websocket'],
+      });
+
+      socketInstance.on('connect', () => {
+        console.log('Socket.IO connected');
+        infoToast('Websocket is connected');
+        console.log('Websocket join room start');
+        socketInstance.emit(
+          'join_user_room',
+          '670d0e1b7fd8a344b87bedb0',
+          response => {
+            console.log('Room joined response:', response);
+            console.log('Websocket joissssn room end');
+          },
+        );
+      });
+
+      // Handling server responses
+      socketInstance.on('room_joined', message => {
+        infoToast('Room joined successfully');
+      });
+
+      socketInstance.on('notification', notification => {
+        console.log('Received notification:', notification);
+        store.dispatch(receiveNotification(notification));
+      });
+
+      // Listening for notifications
+      // socketInstance.on('notification', notification => {
+      //   console.log('Received notification:', notification);
+      // });
+
+      // Dispatch the socket instance to Redux store
+      dispatch(setSocket(socketInstance));
+    };
+    connectSocket();
+
+    // Automatically connect socket when component mounts
+    // useEffect(() => {
+
+    //   // Cleanup function to disconnect the socket when the component unmounts
+    //   return () => {
+    //     if (socket) {
+    //       socket.disconnect();
+    //       dispatch(disconnectSocket());
+    //       console.log('Socket.IO manually disconnected');
+    //     }
+    //   };
+    // }, [userId]);
+
+    // Handle logout and socket disconnection using Redux
+  };
+
+  useEffect(() => {
+    WebSocketComponent('670d0e1b7fd8a344b87bedb0');
+  }, [isFocused]);
 
   useEffect(() => {
     if (time) {
@@ -270,6 +342,7 @@ const HomeScreen = () => {
                     }
                     onPressAdd={() => {
                       addToCart(item);
+                      successToast('Product added to cart');
                     }}
                     onPressHeart={() => {
                       removeWishList(item);

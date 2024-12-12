@@ -28,6 +28,7 @@ import {navigationRef} from '../../navigation/mainNavigator';
 import {addProduct, addWishList} from '../../redux/action/productAction';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {CHANGE_TIME} from '../../redux/actionTypes';
+import {successToast} from '../../utils/commonFunction';
 
 const SearchScreen = () => {
   const {wishListData} = useAppSelector(state => state.product);
@@ -189,7 +190,10 @@ const SearchScreen = () => {
                         images={item?.image}
                         amount={item?.price}
                         description={item?.name}
-                        onPressAdd={() => addToCart(item)}
+                        onPressAdd={() => {
+                          addToCart(item);
+                          successToast('Product added to cart');
+                        }}
                         onPressHeart={() => {
                           removeWishList(item);
                         }}

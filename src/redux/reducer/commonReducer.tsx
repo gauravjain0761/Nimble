@@ -1,6 +1,9 @@
 import {
   CHANGE_TIME,
+  DISCONNECT_SOCKET,
   IS_LOADING,
+  RECEIVE_NOTIFICATION,
+  SET_SOCKET,
   USER_ADDRESS,
   USER_DATA,
   USER_LOGIN,
@@ -15,6 +18,8 @@ const initialState = {
     date: 'Today',
     time: '9:00 am',
   },
+  socket: null,
+  notifications: {},
 };
 
 export default function (state = initialState, action: any) {
@@ -34,6 +39,19 @@ export default function (state = initialState, action: any) {
     case CHANGE_TIME: {
       return {...state, time: action.payload};
     }
+    case SET_SOCKET:
+      return {...state, socket: action.payload};
+    case DISCONNECT_SOCKET:
+      return {...state, socket: null};
+    case RECEIVE_NOTIFICATION:
+      const {recipientId, ...notificationData} = action.payload;
+      return {
+        ...state,
+        notifications: {
+          ...state.notifications,
+          notificationData, // Store by recipientId
+        },
+      };
     default:
       return state;
   }

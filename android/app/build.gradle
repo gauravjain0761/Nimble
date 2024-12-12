@@ -79,7 +79,7 @@ android {
 
     namespace "com.nimble"
     defaultConfig {
-        applicationId "com.nimble"
+        applicationId "com.nimbleapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

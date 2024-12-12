@@ -23,7 +23,18 @@
         <meta-data
           android:name="com.google.android.geo.API_KEY"
           android:value="AIzaSyBTob7oXZoOnDSshaBEg-gZgTmfXeFOhHc"/>
-
+   <meta-data
+        android:name="com.samsung.android.game.gametools"
+        android:value="false" />
+    <meta-data
+        android:name="com.samsung.android.game.gametools.enable"
+        android:value="false" />
+    <meta-data
+        android:name="com.samsung.android.game.service"
+        android:value="false" />
+    <meta-data
+        android:name="com.samsung.android.gamedriver.appinfo"
+        android:value="false" />
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"
@@ -34,6 +45,7 @@
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
+             <category android:name="android.intent.category.APP_BROWSER" />
         </intent-filter>
       </activity>
       
